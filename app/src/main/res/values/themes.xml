@@ -7,7 +7,7 @@
         <item name="android:statusBarColor">#e3ebf9</item>
     </style>
 
-    <style name="BtnLightTheme" parent="Widget.AppCompat.Button">
+    <style name="btnLightTheme" parent="Widget.AppCompat.Button">
         <item name="android:layout_margin">2dp</item>
         <item name="android:background">@drawable/btn_white_ripple</item>
         <item name="android:layout_width">0dp</item>
@@ -16,7 +16,7 @@
 
     </style>
 
-    <style name="BtnDarkTheme" parent="Widget.AppCompat.Button">
+    <style name="btnDarkTheme" parent="Widget.AppCompat.Button">
         <item name="android:layout_margin">2dp</item>
         <item name="android:background">@drawable/btn_ripple</item>
         <item name="android:layout_width">0dp</item>

@@ -1,87 +1,10 @@
 package com.jayk.utilkeyboard
 
 import android.inputmethodservice.InputMethodService
+import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.View
 import com.jayk.utilkeyboard.databinding.KeyboardLayoutBinding
-
-//class KeyboardService : InputMethodService() {
-//
-//    override fun onCreateInputView(): View {
-//
-//        val keyboardBinding = KeyboardLayoutBinding.inflate(layoutInflater)
-//
-//        val buttonIds = arrayOf(
-//            R.id.btn0,
-//            R.id.btn1,
-//            R.id.btn2,
-//            R.id.btn3,
-//            R.id.btn4,
-//            R.id.btn5,
-//            R.id.btn6,
-//            R.id.btn7,
-//            R.id.btn8,
-//            R.id.btn9,
-//            R.id.btn0,
-//            R.id.btnQ,
-//            R.id.btnW,
-//            R.id.btnE,
-//            R.id.btnR,
-//            R.id.btnT,
-//            R.id.btnY,
-//            R.id.btnU,
-//            R.id.btnI,
-//            R.id.btnO,
-//            R.id.btnP,
-//            R.id.btnA,
-//            R.id.btnS,
-//            R.id.btnD,
-//            R.id.btnF,
-//            R.id.btnG,
-//            R.id.btnH,
-//            R.id.btnJ,
-//            R.id.btnK,
-//            R.id.btnL,
-//            R.id.btnZ,
-//            R.id.btnX,
-//            R.id.btnC,
-//            R.id.btnV,
-//            R.id.btnB,
-//            R.id.btnN,
-//            R.id.btnM,
-//            R.id.btnDot,
-//            R.id.btnComma
-//        )
-//
-//        for (buttonId in buttonIds) {
-//            val button = keyboardBinding.root.findViewById<Button>(buttonId)
-//            button.setOnClickListener {
-//                val inputConnection = currentInputConnection
-//                inputConnection?.commitText(button.text.toString(), 1)
-//            }
-//        }
-//
-//        keyboardBinding.btnBackSpace.setOnClickListener {
-//            val inputConnection = currentInputConnection
-//            inputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-//            return@setOnClickListener
-//        }
-//
-//        keyboardBinding.btnSpace.setOnClickListener {
-//            val inputConnection = currentInputConnection
-//            inputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE))
-//            return@setOnClickListener
-//        }
-//
-//        keyboardBinding.btnEnter.setOnClickListener {
-//            val inputConnection = currentInputConnection
-//            inputConnection?.sendKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER))
-//            return@setOnClickListener
-//        }
-//
-//        return keyboardBinding.root
-//    }
-//}
 
 class KeyboardService : InputMethodService() {
 
@@ -90,6 +13,13 @@ class KeyboardService : InputMethodService() {
     override fun onCreateInputView(): View {
         // Setup data binding
         binding = KeyboardLayoutBinding.inflate(layoutInflater)
+
+        fun performHapticFeedback(view: View) {
+            view.performHapticFeedback(
+                HapticFeedbackConstants.KEYBOARD_TAP,
+
+                )
+        }
 
         // Create a map of all letter buttons using data binding references
         val letterButtons = mapOf(
@@ -143,39 +73,45 @@ class KeyboardService : InputMethodService() {
 
         // Set click listeners for all letter buttons
         letterButtons.forEach { (button, text) ->
-            button.setOnClickListener {
+            button.setOnClickListener { view ->
+                performHapticFeedback(view)
                 currentInputConnection?.commitText(text, 1)
             }
         }
 
         // Set click listeners for all number buttons
         numberButtons.forEach { (button, text) ->
-            button.setOnClickListener {
+            button.setOnClickListener { view ->
+                performHapticFeedback(view)
                 currentInputConnection?.commitText(text, 1)
             }
         }
 
         // Set click listeners for punctuation buttons
         punctuationButtons.forEach { (button, text) ->
-            button.setOnClickListener {
+            button.setOnClickListener { view ->
+                performHapticFeedback(view)
                 currentInputConnection?.commitText(text, 1)
             }
         }
 
         // Special keys
-        binding.btnBackSpace.setOnClickListener {
+        binding.btnBackSpace.setOnClickListener { view ->
+            performHapticFeedback(view)
             currentInputConnection?.sendKeyEvent(
                 KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
             )
         }
 
-        binding.btnSpace.setOnClickListener {
+        binding.btnSpace.setOnClickListener { view ->
+            performHapticFeedback(view)
             currentInputConnection?.sendKeyEvent(
                 KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE)
             )
         }
 
-        binding.btnEnter.setOnClickListener {
+        binding.btnEnter.setOnClickListener { view ->
+            performHapticFeedback(view)
             currentInputConnection?.sendKeyEvent(
                 KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER)
             )

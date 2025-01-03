@@ -4,4 +4,6 @@
     <string name="util_keyboard">Util Keyboard</string>
     <string name="enable_keyboard">enable keyboard</string>
     <string name="choose_keyboard">choose keyboard</string>
+    <string name="And"><![CDATA[&]]></string>
+
 </resources>

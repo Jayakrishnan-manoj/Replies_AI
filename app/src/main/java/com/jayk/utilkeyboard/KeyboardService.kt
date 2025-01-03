@@ -11,6 +11,7 @@ class KeyboardService : InputMethodService() {
 
     private lateinit var binding: KeyboardLayoutBinding
     private var isCapitalized = false
+    private var isSymbolsMode = false
 
     override fun onCreateInputView(): View {
         // Setup data binding
@@ -75,12 +76,68 @@ class KeyboardService : InputMethodService() {
             binding.btnComma to ","
         )
 
-        fun updateButtonTexts() {
-            letterButtons.forEach { (button, textPair) ->
-                button.text = if (isCapitalized) textPair.second else textPair.first
-            }
+        val symbolButtons = mapOf(
+            binding.btnZ to "*",
+            binding.btnX to "\"",
+            binding.btnC to "'",
+            binding.btnV to ":",
+            binding.btnB to ";",
+            binding.btnN to "!",
+            binding.btnM to "?"
+        )
 
+        fun updateButtonTexts() {
+            if (isSymbolsMode) {
+                symbolButtons.forEach { (button, symbol) ->
+                    button.text = symbol
+                }
+            } else {
+                letterButtons.forEach { (button, textPair) ->
+                    button.text = if (isCapitalized) textPair.second else textPair.first
+                }
+            }
         }
+
+        fun toggleSymbolsMode() {
+
+            isSymbolsMode = !isSymbolsMode
+            println(isSymbolsMode)
+            if (isSymbolsMode){
+                binding.btnSymbols.setText("ABC")
+            }else{
+                binding.btnSymbols.setText("123")
+            }
+            binding.asdf.visibility = if(isSymbolsMode) View.GONE else View.VISIBLE
+            binding.qwerty.visibility = if (isSymbolsMode) View.GONE else View.VISIBLE
+            binding.SymbolsFirst.visibility = if (isSymbolsMode) View.VISIBLE else View.GONE
+            binding.numbers.visibility = if (isSymbolsMode) View.VISIBLE else View.GONE
+            updateButtonTexts()
+        }
+
+//        fun updateButtonTexts() {
+//            if (!isSymbolsMode) {
+//                binding.qwerty.visibility = View.VISIBLE
+//                binding.SymbolsFirst.visibility = View.GONE
+//                binding.numbers.visibility = View.GONE
+//                binding.asdf.visibility = View.VISIBLE
+//
+//
+//
+//                symbolButtons.forEach { (button, symbol) ->
+//                    button.text = symbol
+//                }
+//            } else {
+//                binding.qwerty.visibility = View.GONE
+//                binding.SymbolsFirst.visibility = View.VISIBLE
+//                binding.numbers.visibility = View.VISIBLE
+//                binding.asdf.visibility = View.GONE
+//                letterButtons.forEach { (button, textPair) ->
+//                    button.text = if (isCapitalized) textPair.second else textPair.first
+//                }
+//            }
+//
+//
+//        }
 
         // Set click listeners for all letter buttons
         letterButtons.forEach { (button, textPair) ->
@@ -101,6 +158,8 @@ class KeyboardService : InputMethodService() {
             }
         }
 
+
+
         // Set click listeners for punctuation buttons
         punctuationButtons.forEach { (button, text) ->
             button.setOnClickListener { view ->
@@ -108,6 +167,17 @@ class KeyboardService : InputMethodService() {
                 currentInputConnection?.commitText(text, 1)
             }
         }
+
+        binding.btnSymbols.setOnClickListener { view ->
+            performHapticFeedback(view)
+            toggleSymbolsMode()
+        }
+
+//        binding.btnSymbols.setOnClickListener { view->
+//            performHapticFeedback(view)
+//            isSymbolsMode = !isSymbolsMode
+//            updateButtonTexts()
+//        }
 
         // Special keys
         binding.btnBackSpace.setOnClickListener { view ->
@@ -117,54 +187,36 @@ class KeyboardService : InputMethodService() {
             )
         }
 
-        binding.btnCapitalize.setOnClickListener { view->
+//        binding.btnCapitalize.setOnClickListener { view ->
+//            performHapticFeedback(view)
+//            println(isCapitalized)
+//            currentInputConnection?.sendKeyEvent(
+//                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_CAPS_LOCK)
+//            )
+//            isCapitalized = !isCapitalized
+//            updateButtonTexts()
+//
+//            binding.apply {
+//                if (!isCapitalized) {
+//                    btnCapitalize.backgroundTintList =
+//                        ContextCompat.getColorStateList(baseContext, R.color.greyColor)
+//                } else {
+//                    btnCapitalize.backgroundTintList =
+//                        ContextCompat.getColorStateList(baseContext, R.color.primaryColor)
+//                }
+//
+//            }
+//
+//        }
+
+        binding.btnCapitalize.setOnClickListener { view ->
             performHapticFeedback(view)
-            println(isCapitalized)
-            currentInputConnection?.sendKeyEvent(
-                KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_CAPS_LOCK)
-            )
             isCapitalized = !isCapitalized
             updateButtonTexts()
-
-            binding.apply {
-                if(!isCapitalized){
-                    btnCapitalize.backgroundTintList = ContextCompat.getColorStateList(baseContext,R.color.greyColor)
-                }else{
-                    btnCapitalize.backgroundTintList = ContextCompat.getColorStateList (baseContext, R.color.primaryColor)
-                }
-
-            }
-
-//            // Change the visible text on all letter buttons
-//            binding.apply {
-//                btnA.text = if (isCapitalized) "A" else "a"
-//                btnB.text = if (isCapitalized) "B" else "b"
-//                btnC.text = if (isCapitalized) "C" else "c"
-//                btnD.text = if (isCapitalized) "D" else "d"
-//                btnE.text = if (isCapitalized) "E" else "e"
-//                btnF.text = if (isCapitalized) "F" else "f"
-//                btnG.text = if (isCapitalized) "G" else "g"
-//                btnH.text = if (isCapitalized) "H" else "h"
-//                btnI.text = if (isCapitalized) "I" else "i"
-//                btnJ.text = if (isCapitalized) "J" else "j"
-//                btnK.text = if (isCapitalized) "K" else "k"
-//                btnL.text = if (isCapitalized) "L" else "l"
-//                btnM.text = if (isCapitalized) "M" else "m"
-//                btnN.text = if (isCapitalized) "N" else "n"
-//                btnO.text = if (isCapitalized) "O" else "o"
-//                btnP.text = if (isCapitalized) "P" else "p"
-//                btnQ.text = if (isCapitalized) "Q" else "q"
-//                btnR.text = if (isCapitalized) "R" else "r"
-//                btnS.text = if (isCapitalized) "S" else "s"
-//                btnT.text = if (isCapitalized) "T" else "t"
-//                btnU.text = if (isCapitalized) "U" else "u"
-//                btnV.text = if (isCapitalized) "V" else "v"
-//                btnW.text = if (isCapitalized) "W" else "w"
-//                btnX.text = if (isCapitalized) "X" else "x"
-//                btnY.text = if (isCapitalized) "Y" else "y"
-//                btnZ.text = if (isCapitalized) "Z" else "z"
-//            }
-
+            binding.btnCapitalize.backgroundTintList = ContextCompat.getColorStateList(
+                baseContext,
+                if (isCapitalized) R.color.primaryColor else R.color.greyColor
+            )
         }
 
         //updateButtonTexts()

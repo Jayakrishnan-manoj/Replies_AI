@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="40dp"
-    android:background="#424B54"
+    android:paddingBottom="20dp"
+    android:background="#111111"
     android:orientation="vertical">
 
     <LinearLayout
@@ -87,6 +88,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/SymbolsFirst"
         android:layout_gravity="center"
+        android:layout_marginTop="5dp"
         android:layout_marginHorizontal="5dp"
         android:gravity="center"
         android:orientation="horizontal"
@@ -307,6 +309,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginHorizontal="5dp"
+        android:id="@+id/zxcv"
+        android:visibility="visible"
         android:gravity="center"
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
@@ -375,6 +379,76 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginHorizontal="5dp"
+        android:id="@+id/symbolsLast"
+        android:visibility="gone"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp"
+        android:weightSum="10">
+
+        <ImageButton
+            android:id="@+id/btnCapitalize2"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+
+            android:src="@drawable/ic_capitalize" />
+
+        <Button
+            android:id="@+id/btnStar"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+            android:text="*" />
+
+        <Button
+            android:id="@+id/btnDQ"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+            android:text="@string/double_quotes" />
+
+        <Button
+            android:id="@+id/btnSQ"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+            android:text="\'" />
+
+        <Button
+            android:id="@+id/btnColon"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+            android:text=":" />
+
+        <Button
+            android:id="@+id/btnSemiColon"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+            android:text=";" />
+
+        <Button
+            android:id="@+id/btnExclamation"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+            android:text="!" />
+
+        <Button
+            android:id="@+id/btnQn"
+            style="@style/btnLightTheme"
+            android:layout_weight="1"
+            android:text="\?" />
+
+        <ImageButton
+            android:id="@+id/btnBackSpace2"
+            style="@style/btnDarkTheme"
+            android:layout_weight="1.5"
+            android:src="@drawable/ic_backspace" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="5dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:layout_marginTop="5dp"
@@ -385,7 +459,7 @@
             style="@style/btnSymbolsTheme"
             android:id="@+id/btnSymbols"
             android:layout_weight="1.5"
-            android:text="123"/>
+            android:text="\?123"/>
 
         <Button
             android:id="@+id/btnComma"

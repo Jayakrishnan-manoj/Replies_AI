@@ -5,5 +5,6 @@
     <string name="enable_keyboard">enable keyboard</string>
     <string name="choose_keyboard">choose keyboard</string>
     <string name="And"><![CDATA[&]]></string>
+    <string name="double_quotes">\"</string>
 
 </resources>

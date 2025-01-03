@@ -14,7 +14,6 @@ class KeyboardService : InputMethodService() {
     private var isSymbolsMode = false
 
     override fun onCreateInputView(): View {
-        // Setup data binding
         binding = KeyboardLayoutBinding.inflate(layoutInflater)
 
         println(isCapitalized)
@@ -26,7 +25,6 @@ class KeyboardService : InputMethodService() {
                 )
         }
 
-        // Create a map of all letter buttons using data binding references
         val letterButtons = mapOf(
             binding.btnA to Pair("a", "A"),
             binding.btnB to Pair("b", "B"),
@@ -56,7 +54,6 @@ class KeyboardService : InputMethodService() {
             binding.btnZ to Pair("z", "Z")
         )
 
-        // Create a map of all number buttons
         val numberButtons = mapOf(
             binding.btn0 to "0",
             binding.btn1 to "1",
@@ -70,21 +67,31 @@ class KeyboardService : InputMethodService() {
             binding.btn9 to "9"
         )
 
-        // Create a map of punctuation buttons
         val punctuationButtons = mapOf(
             binding.btnDot to ".",
             binding.btnComma to ","
         )
 
         val symbolButtons = mapOf(
-            binding.btnZ to "*",
-            binding.btnX to "\"",
-            binding.btnC to "'",
-            binding.btnV to ":",
-            binding.btnB to ";",
-            binding.btnN to "!",
-            binding.btnM to "?"
+            binding.btnStar to "*",
+            binding.btnDQ to "\"",
+            binding.btnSQ to "'",
+            binding.btnColon to ":",
+            binding.btnSemiColon to ";",
+            binding.btnExclamation to "!",
+            binding.btnQn to "?",
+            binding.btnAt to "@",
+            binding.btnHash to "#",
+            binding.btnAnd to "&",
+            binding.btnUnderscore to "_",
+            binding.btnMinus to "-",
+            binding.btnDollar to "$",
+            binding.btnLeftBrace to "(",
+            binding.btnRightBrace to ")",
+            binding.btnPlus to "+",
+            binding.btnSlash to "/"
         )
+
 
         fun updateButtonTexts() {
             if (isSymbolsMode) {
@@ -111,35 +118,19 @@ class KeyboardService : InputMethodService() {
             binding.qwerty.visibility = if (isSymbolsMode) View.GONE else View.VISIBLE
             binding.SymbolsFirst.visibility = if (isSymbolsMode) View.VISIBLE else View.GONE
             binding.numbers.visibility = if (isSymbolsMode) View.VISIBLE else View.GONE
+            binding.symbolsLast.visibility = if (isSymbolsMode) View.VISIBLE else View.GONE
+            binding.zxcv.visibility = if(isSymbolsMode) View.GONE else View.VISIBLE
             updateButtonTexts()
         }
 
-//        fun updateButtonTexts() {
-//            if (!isSymbolsMode) {
-//                binding.qwerty.visibility = View.VISIBLE
-//                binding.SymbolsFirst.visibility = View.GONE
-//                binding.numbers.visibility = View.GONE
-//                binding.asdf.visibility = View.VISIBLE
-//
-//
-//
-//                symbolButtons.forEach { (button, symbol) ->
-//                    button.text = symbol
-//                }
-//            } else {
-//                binding.qwerty.visibility = View.GONE
-//                binding.SymbolsFirst.visibility = View.VISIBLE
-//                binding.numbers.visibility = View.VISIBLE
-//                binding.asdf.visibility = View.GONE
-//                letterButtons.forEach { (button, textPair) ->
-//                    button.text = if (isCapitalized) textPair.second else textPair.first
-//                }
-//            }
-//
-//
-//        }
+        symbolButtons.forEach{(button,text)->
+            button.setOnClickListener { view->
+                performHapticFeedback(view)
+                currentInputConnection?.commitText(text,1)
 
-        // Set click listeners for all letter buttons
+            }
+        }
+
         letterButtons.forEach { (button, textPair) ->
             button.setOnClickListener { view ->
                 view.performHapticFeedback(
@@ -150,7 +141,6 @@ class KeyboardService : InputMethodService() {
             }
         }
 
-        // Set click listeners for all number buttons
         numberButtons.forEach { (button, text) ->
             button.setOnClickListener { view ->
                 performHapticFeedback(view)
@@ -158,9 +148,6 @@ class KeyboardService : InputMethodService() {
             }
         }
 
-
-
-        // Set click listeners for punctuation buttons
         punctuationButtons.forEach { (button, text) ->
             button.setOnClickListener { view ->
                 performHapticFeedback(view)
@@ -173,13 +160,6 @@ class KeyboardService : InputMethodService() {
             toggleSymbolsMode()
         }
 
-//        binding.btnSymbols.setOnClickListener { view->
-//            performHapticFeedback(view)
-//            isSymbolsMode = !isSymbolsMode
-//            updateButtonTexts()
-//        }
-
-        // Special keys
         binding.btnBackSpace.setOnClickListener { view ->
             performHapticFeedback(view)
             currentInputConnection?.sendKeyEvent(
@@ -187,29 +167,24 @@ class KeyboardService : InputMethodService() {
             )
         }
 
-//        binding.btnCapitalize.setOnClickListener { view ->
-//            performHapticFeedback(view)
-//            println(isCapitalized)
-//            currentInputConnection?.sendKeyEvent(
-//                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_CAPS_LOCK)
-//            )
-//            isCapitalized = !isCapitalized
-//            updateButtonTexts()
-//
-//            binding.apply {
-//                if (!isCapitalized) {
-//                    btnCapitalize.backgroundTintList =
-//                        ContextCompat.getColorStateList(baseContext, R.color.greyColor)
-//                } else {
-//                    btnCapitalize.backgroundTintList =
-//                        ContextCompat.getColorStateList(baseContext, R.color.primaryColor)
-//                }
-//
-//            }
-//
-//        }
+        binding.btnBackSpace2.setOnClickListener { view ->
+            performHapticFeedback(view)
+            currentInputConnection?.sendKeyEvent(
+                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
+            )
+        }
 
         binding.btnCapitalize.setOnClickListener { view ->
+            performHapticFeedback(view)
+            isCapitalized = !isCapitalized
+            updateButtonTexts()
+            binding.btnCapitalize.backgroundTintList = ContextCompat.getColorStateList(
+                baseContext,
+                if (isCapitalized) R.color.primaryColor else R.color.greyColor
+            )
+        }
+
+        binding.btnCapitalize2.setOnClickListener { view ->
             performHapticFeedback(view)
             isCapitalized = !isCapitalized
             updateButtonTexts()

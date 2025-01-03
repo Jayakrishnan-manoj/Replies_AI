@@ -30,7 +30,7 @@
             android:id="@+id/btnEnableKeyboard"
             android:textAllCaps="false"
             app:cornerRadius="14dp"
-            android:backgroundTint="#f69a4d"
+            android:backgroundTint="#FF5789"
             android:layout_marginTop="20dp"
             android:text="@string/enable_keyboard"/>
 
@@ -40,7 +40,7 @@
             android:id="@+id/btnChooseKeyboard"
             android:textAllCaps="false"
             app:cornerRadius="14dp"
-            android:backgroundTint="#f69a4d"
+            android:backgroundTint="#FF5789"
             android:layout_marginTop="20dp"
             android:text="@string/choose_keyboard"/>
 

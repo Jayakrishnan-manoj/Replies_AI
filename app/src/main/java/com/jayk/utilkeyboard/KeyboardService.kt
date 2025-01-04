@@ -174,6 +174,10 @@ class KeyboardService : InputMethodService() {
             )
         }
 
+        binding.btnAI.setOnClickListener {
+
+        }
+
         binding.btnCapitalize.setOnClickListener { view ->
             performHapticFeedback(view)
             isCapitalized = !isCapitalized

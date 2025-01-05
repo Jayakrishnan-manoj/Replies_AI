@@ -1,10 +1,11 @@
-package com.jayk.utilkeyboard
+package com.jayk.utilkeyboard.services
 
 import android.inputmethodservice.InputMethodService
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.jayk.utilkeyboard.R
 import com.jayk.utilkeyboard.databinding.KeyboardLayoutBinding
 
 class KeyboardService : InputMethodService() {

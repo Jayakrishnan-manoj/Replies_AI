@@ -13,7 +13,7 @@
         android:theme="@style/Theme.UtilKeyboard"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".App"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".KeyboardService"
+            android:name=".services.KeyboardService"
             android:exported="true"
             android:label="Util Keyboard"
             android:permission="android.permission.BIND_INPUT_METHOD">
@@ -33,6 +33,19 @@
                 android:name="android.view.im"
                 android:resource="@xml/method" />
         </service>
+        <service
+            android:name=".services.MessageAccessibilityService"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService"/>
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+
+        </service>
+
 
     </application>
 

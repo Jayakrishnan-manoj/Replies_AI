@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
 }
 
@@ -41,6 +42,30 @@ android {
 }
 
 dependencies {
+
+    // ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    // LiveData
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    // Saved state module for ViewModel
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    // Annotation processor
+    kapt(libs.androidx.lifecycle.compiler)
+
+    implementation(libs.kotlinx.coroutines.android)
+
+    implementation("com.google.dagger:hilt-android:2.51.1") // Replace with the latest version
+    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
+
+//    implementation(libs.dagger)
+//    kapt(libs.dagger.compiler)
+
+    implementation (libs.retrofit)
+
+    implementation(libs.converter.gson)
+
+    implementation(libs.logging.interceptor)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -17,6 +20,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val properties = Properties()
+        file("local.properties").takeIf { it.exists() }?.let {
+            FileInputStream(it).use { stream ->
+                properties.load(stream)
+            }
+        }
+        buildConfigField("String","API_KEY","\"${properties.getProperty("API_KEY")}\"")
     }
 
     buildTypes {
@@ -38,6 +49,7 @@ android {
     buildFeatures {
         viewBinding = true
         dataBinding = true
+        buildConfig = true
     }
 }
 
@@ -65,6 +77,11 @@ dependencies {
     implementation(libs.converter.gson)
 
     implementation(libs.logging.interceptor)
+
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-common-java8:2.6.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 
 
     implementation(libs.androidx.core.ktx)

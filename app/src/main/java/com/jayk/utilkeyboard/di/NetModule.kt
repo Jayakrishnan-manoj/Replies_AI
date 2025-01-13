@@ -20,7 +20,7 @@ object NetModule {
     @Provides
     @Singleton
     fun providesRetrofit(): Retrofit {
-        return Retrofit.Builder().baseUrl("https://api.openai.com/v1")
+        return Retrofit.Builder().baseUrl("https://api.openai.com/v1/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
     }

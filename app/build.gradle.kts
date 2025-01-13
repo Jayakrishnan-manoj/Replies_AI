@@ -21,13 +21,25 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val properties = Properties()
-        file("local.properties").takeIf { it.exists() }?.let {
-            FileInputStream(it).use { stream ->
-                properties.load(stream)
-            }
-        }
-        buildConfigField("String","API_KEY","\"${properties.getProperty("API_KEY")}\"")
+//        val properties = Properties()
+//
+//        file("local.properties").takeIf { it.exists() }?.let {
+//
+//            FileInputStream(it).use { stream ->
+//                properties.load(stream)
+//                println("API_KEY loaded: ${properties.getProperty("API_KEY")}")
+//            }
+//        }
+//        val apiKey = properties.getProperty("API_KEY") ?: "MISSING"
+        buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY")}\"")
+
+//        val properties = Properties()
+//        file("local.properties").takeIf { it.exists() }?.let {
+//            FileInputStream(it).use { stream ->
+//                properties.load(stream)
+//            }
+//        }
+//        buildConfigField("String","API_KEY","\"${properties.getProperty("API_KEY")}\"")
     }
 
     buildTypes {

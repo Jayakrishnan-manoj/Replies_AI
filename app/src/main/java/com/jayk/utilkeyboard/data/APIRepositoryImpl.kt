@@ -1,5 +1,6 @@
 package com.jayk.utilkeyboard.data
 
+import com.jayk.utilkeyboard.BuildConfig
 import com.jayk.utilkeyboard.data.models.request.ChatRequest
 import com.jayk.utilkeyboard.data.models.request.Message
 import com.jayk.utilkeyboard.data.models.response.ChatResponse
@@ -15,8 +16,9 @@ class APIRepositoryImpl @Inject constructor(
         messages: List<Message>
     ): ApiResult<ChatResponse> {
         return try {
+            println("the key is ${BuildConfig.API_KEY}")
             val response = apiService.getSearchResults(
-                "Bearer ",
+                "Bearer ${BuildConfig.API_KEY}",
                 ChatRequest(messages, model)
             )
             ApiResult.Success(response)

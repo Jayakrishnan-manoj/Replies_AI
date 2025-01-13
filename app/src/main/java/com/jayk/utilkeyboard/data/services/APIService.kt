@@ -11,7 +11,7 @@ interface APIService {
     @Headers(
         "Content-Type:application/json"
     )
-    @POST("/chat/completions")
+    @POST("chat/completions")
     suspend fun getSearchResults(
         @Header("Authorization") authHeader:String,
         @Body request: ChatRequest

@@ -16,7 +16,6 @@ class APIRepositoryImpl @Inject constructor(
         messages: List<Message>
     ): ApiResult<ChatResponse> {
         return try {
-            println("the key is ${BuildConfig.API_KEY}")
             val response = apiService.getSearchResults(
                 "Bearer ${BuildConfig.API_KEY}",
                 ChatRequest(messages, model)

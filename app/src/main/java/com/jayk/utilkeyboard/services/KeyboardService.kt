@@ -1,11 +1,14 @@
 package com.jayk.utilkeyboard.services
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.inputmethodservice.InputMethodService
 import android.provider.Settings
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.View
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -13,8 +16,14 @@ import androidx.lifecycle.ViewModel
 import androidx.activity.viewModels
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 import com.jayk.utilkeyboard.R
+import com.jayk.utilkeyboard.databinding.ChatSuggestionsLayoutBinding
 import com.jayk.utilkeyboard.databinding.KeyboardLayoutBinding
+import com.jayk.utilkeyboard.presentation.SuggestionsAdapter
 import com.jayk.utilkeyboard.repositories.AccessibilityRepository
 import com.jayk.utilkeyboard.viewmodel.ChatViewModel
 import com.jayk.utilkeyboard.viewmodel.ChatViewModelFactory
@@ -27,6 +36,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,10 +44,14 @@ class KeyboardService(
 
 ) : InputMethodService(), ViewModelStoreOwner {
 
+    private lateinit var suggestionsAdapter: SuggestionsAdapter
+    private var currentMode = "Happy"
+
     @Inject
     lateinit var chatViewModelFactory: ChatViewModelFactory
 
     private lateinit var binding: KeyboardLayoutBinding
+    private lateinit var chatBinding: ChatSuggestionsLayoutBinding
     private val serviceScope = CoroutineScope(Dispatchers.Main + Job())
     private val _viewModelStore by lazy { ViewModelStore() }
     private val chatViewModel: ChatViewModel by lazy {
@@ -45,6 +59,7 @@ class KeyboardService(
     }
     private var isCapitalized = false
     private var isSymbolsMode = false
+    private var isChatScreen = false
 
 
     @Inject
@@ -54,8 +69,10 @@ class KeyboardService(
     private val _isAccessibilityEnabled = MutableStateFlow(false)
     val isAccessibilityEnabled: StateFlow<Boolean> = _isAccessibilityEnabled.asStateFlow()
 
+
     override fun onCreate() {
         super.onCreate()
+        observeViewModel()
         getMessages()
     }
 
@@ -80,50 +97,9 @@ class KeyboardService(
         serviceScope.cancel()
     }
 
-    //    @Inject
-//    lateinit var viewModelFactory: ViewModelProvider.Factory
-//
-//    @Inject
-//    lateinit var viewModel: KeyboardViewModel  // Direct injection instead of using viewModels() delegate
-//
     override val viewModelStore: ViewModelStore
         get() = _viewModelStore
 
-
-//     Implement ViewModelStoreOwner interface
-//    fun getViewModelStore(): ViewModelStore = viewModelStore
-
-
-//    private val viewModelStoreOwner = object : ViewModelStoreOwner {
-//        override val viewModelStore: ViewModelStore
-//            get() = this@KeyboardService.viewModelStore
-//    }
-
-//    private val viewModel by lazy {
-//        val factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-//        ViewModelProvider(viewModelStoreOwner, factory)[KeyboardViewModel::class.java]
-//    }
-
-//    override fun onCreate() {
-//        super.onCreate()
-//
-////        viewModel = ViewModelProvider(
-////            owner = this,
-////            factory = viewModelFactory
-////        )[KeyboardViewModel::class.java]
-//
-//        observeViewModel()
-//    }
-
-//    private fun observeViewModel(){
-//        serviceScope.launch{
-//            viewModel.isAccessibilityEnabled.collect{ isEnabled->
-//                if(!isEnabled){
-//                    showAccessibilityPrompt()
-//                }
-//            }
-//        }
-//    }
 
     private fun showAccessibilityPrompt() {
         val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
@@ -139,6 +115,11 @@ class KeyboardService(
 
     override fun onCreateInputView(): View {
         binding = KeyboardLayoutBinding.inflate(layoutInflater)
+        chatBinding = ChatSuggestionsLayoutBinding.inflate(layoutInflater)
+
+        setupButtons()
+        setupRecyclerView()
+        setupClickListeners()
 
         println(isCapitalized)
 
@@ -298,11 +279,6 @@ class KeyboardService(
             )
         }
 
-        binding.btnAI.setOnClickListener {
-            chatViewModel.sendMessage("How are you today?")
-            getMessages()
-        }
-
         binding.btnCapitalize.setOnClickListener { view ->
             performHapticFeedback(view)
             isCapitalized = !isCapitalized
@@ -339,7 +315,78 @@ class KeyboardService(
             )
         }
 
-        return binding.root
+        return if (isChatScreen) chatBinding.root else binding.root
+    }
+
+    private fun setupButtons() {
+        chatBinding.apply {
+            btnHappy.setOnClickListener {
+                updateButtonStates(it as Button, "Happy")
+                chatViewModel.sendMessage("happy: Hey I jst got into harvard")
+            }
+
+            btnSad.setOnClickListener {
+                updateButtonStates(it as Button, "Sad")
+                chatViewModel.sendMessage("sad: I got  rejected from harvard")
+            }
+
+            btnAngry.setOnClickListener {
+                updateButtonStates(it as Button, "Angry")
+                chatViewModel.sendMessage("angry: I crashed your car")
+            }
+
+            btnGoBack.setOnClickListener {
+                isChatScreen = false
+                setInputView(onCreateInputView())
+            }
+        }
+    }
+
+    private fun updateButtonStates(selectedButton: Button, mode: String) {
+        // Reset all buttons
+        chatBinding.apply {
+            btnHappy.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
+            btnSad.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
+            btnAngry.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
+        }
+
+        // Highlight selected button
+        selectedButton.backgroundTintList = ColorStateList.valueOf(getColor(R.color.primaryColor))
+        currentMode = mode
+    }
+
+    private fun setupRecyclerView() {
+        suggestionsAdapter = SuggestionsAdapter { suggestion ->
+            // Handle suggestion click
+            getCurrentInputConnection()?.commitText(suggestion, 1)
+        }
+
+        chatBinding.suggestionsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = suggestionsAdapter
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.btnAI.setOnClickListener {
+            isChatScreen = true
+            chatViewModel.sendMessage("formal: Send some general formal text replies")
+            getMessages()
+            // Update the input view to show chat layout
+            setInputView(onCreateInputView())
+        }
+    }
+
+    private fun observeViewModel() {
+        chatViewModel.chatResponse.observeForever { chatResponse ->
+            val suggestions = chatResponse.choices.firstOrNull()?.message?.content?.let { content ->
+                // Parse the content string into a list of suggestions
+                content.trim('[', ']').split(',').map { it.trim() }
+            } ?: emptyList()
+
+            suggestionsAdapter.submitList(suggestions)
+            chatBinding.loadingIndicator.visibility = View.GONE
+        }
     }
 
 }

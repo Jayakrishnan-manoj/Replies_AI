@@ -4,4 +4,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="primaryColor">#066839</color>
     <color name="greyColor">#313131</color>
+    <color name="dark_background">#121212</color>
+    <color name="message_background">#303030</color>
 </resources>

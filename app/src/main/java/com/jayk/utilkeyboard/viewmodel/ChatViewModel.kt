@@ -18,29 +18,38 @@ class ChatViewModel @Inject constructor(
     private val _chatResponse = MutableLiveData<ChatResponse>()
     val chatResponse: LiveData<ChatResponse> = _chatResponse
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
 
     fun sendMessage(message: String) {
         viewModelScope.launch {
-            val messages = listOf(
-                Message("For the text that user sends which is in the format: \"emotion:message\", give 3 appropriate responses in the emotion provided. The response must be an array of replies." +
-                        "example: " +
-                        "user message - happy: I'm getting a raise, your response: [oh that's great!,so happy for you!,congratulations!]", "developer"),
-                Message( message, "user")
-            )
 
-            when( val result = repository.getSearchResults("gpt-4o", messages)){
-                is ApiResult.Success ->{
-                    val response = result.data.choices.firstOrNull()?.message?.content
-                    val suggestions = response?.trim('[', ']')?.split(',')?.map { it.trim() }
-                    _chatResponse.postValue(result.data)
+            _isLoading.value = true
+            try {
+                val messages = listOf(
+                    Message("For the text that user sends which is in the format: \"emotion:message\", give 4 appropriate responses in the emotion provided. The response must be an array of replies separating each message with a double pipe (`||`)." +
+                            "example: " +
+                            "user message - happy: I'm getting a raise, your response: [oh that's great!||so happy for you!||congratulations!]", "developer"),
+                    Message( message, "user")
+                )
 
+                when( val result = repository.getSearchResults("gpt-4o", messages)){
+                    is ApiResult.Success ->{
+                        _chatResponse.postValue(result.data)
+
+                    }
+                    is ApiResult.Error -> {
+                        val errorMessage = result.message
+
+                        println(errorMessage)
+                    }
                 }
-                is ApiResult.Error -> {
-                    val errorMessage = result.message
-
-                    println(errorMessage)
-                }
+            } finally {
+                _isLoading.value = false
             }
+
+
         }
     }
 

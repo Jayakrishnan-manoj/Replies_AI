@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.inputmethodservice.InputMethodService
 import android.provider.Settings
+import android.util.Log
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.View
@@ -100,18 +101,6 @@ class KeyboardService(
     override val viewModelStore: ViewModelStore
         get() = _viewModelStore
 
-
-    private fun showAccessibilityPrompt() {
-        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        Toast.makeText(
-            this,
-            "Please enable accessibility for the keyboard",
-            Toast.LENGTH_LONG
-        ).show()
-        startActivity(intent)
-    }
 
     override fun onCreateInputView(): View {
         binding = KeyboardLayoutBinding.inflate(layoutInflater)
@@ -335,6 +324,21 @@ class KeyboardService(
                 chatViewModel.sendMessage("angry: I crashed your car")
             }
 
+            btnExcited.setOnClickListener {
+                updateButtonStates(it as Button, "Excited")
+                chatViewModel.sendMessage("Excited: I crashed your car")
+            }
+
+            btnFlirty.setOnClickListener {
+                updateButtonStates(it as Button, "Flirty")
+                chatViewModel.sendMessage("Flirty: I wanna get some sleep")
+            }
+
+            btnFunny.setOnClickListener {
+                updateButtonStates(it as Button, "Funny")
+                chatViewModel.sendMessage("Funny: I crashed your car")
+            }
+
             btnGoBack.setOnClickListener {
                 isChatScreen = false
                 setInputView(onCreateInputView())
@@ -348,6 +352,9 @@ class KeyboardService(
             btnHappy.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
             btnSad.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
             btnAngry.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
+            btnFunny.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
+            btnExcited.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
+            btnFlirty.backgroundTintList = ColorStateList.valueOf(getColor(R.color.greyColor))
         }
 
         // Highlight selected button
@@ -370,19 +377,31 @@ class KeyboardService(
     private fun setupClickListeners() {
         binding.btnAI.setOnClickListener {
             isChatScreen = true
+            setInputView(onCreateInputView())
             chatViewModel.sendMessage("formal: Send some general formal text replies")
             getMessages()
             // Update the input view to show chat layout
-            setInputView(onCreateInputView())
+
         }
     }
 
     private fun observeViewModel() {
+        chatViewModel.isLoading.observeForever{isLoading ->
+            if(isLoading) {
+                chatBinding.loadingIndicator.visibility = View.VISIBLE
+                chatBinding.suggestionsRecyclerView.visibility = View.GONE
+            } else {
+                chatBinding.loadingIndicator.visibility = View.GONE
+                chatBinding.suggestionsRecyclerView.visibility = View.VISIBLE
+            }
+
+        }
+
         chatViewModel.chatResponse.observeForever { chatResponse ->
             val suggestions = chatResponse.choices.firstOrNull()?.message?.content?.let { content ->
-                // Parse the content string into a list of suggestions
-                content.trim('[', ']').split(',').map { it.trim() }
+                content.trim('[', ']').split("||").map { it.trim() }
             } ?: emptyList()
+            println(suggestions)
 
             suggestionsAdapter.submitList(suggestions)
             chatBinding.loadingIndicator.visibility = View.GONE

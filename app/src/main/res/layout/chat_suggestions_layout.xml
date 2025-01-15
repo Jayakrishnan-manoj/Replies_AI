@@ -128,11 +128,12 @@
     <FrameLayout
         android:id="@+id/contentLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="250dp"
         >  <!-- Adjust height as needed for keyboard -->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/suggestionsRecyclerView"
+            android:visibility="gone"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="8dp" />

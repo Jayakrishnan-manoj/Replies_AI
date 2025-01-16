@@ -20,34 +20,17 @@ class AccessibilityRepositoryImpl @Inject constructor(
         val accessibilityService = MessageAccessibilityService.getInstance()
             ?: return emptyList()
 
-        val rootNode = accessibilityService.rootInActiveWindow
-            ?: return emptyList()
-
-//        val rootNode = context.findViewsWithText(null, "", Find.FIND_VIEWS_WITH_TEXT)
-//            .firstOrNull()?.rootView?.createAccessibilityNodeInfo() ?: return emptyList()
-
-        return extractMessages(rootNode)
+        return accessibilityService.getLatestMessages()
     }
 
-
-
-    private fun extractMessages(node: AccessibilityNodeInfo): List<String> {
-        val messages = mutableListOf<String>()
-        findTextNodes(node, messages)
-
-        return messages.takeLast(5)
-    }
-
-    private fun findTextNodes(node: AccessibilityNodeInfo, messages: MutableList<String>) {
-        if (node.text != null && !node.text.isNullOrBlank()) {
-            messages.add(node.text.toString())
+    override fun getLastMessage(): String? {
+        if (!accessibilityManager.isEnabled) {
+            return null
         }
 
-        for (i in 0 until node.childCount) {
-            val child = node.getChild(i) ?: continue
-            findTextNodes(child, messages)
+        val accessibilityService = MessageAccessibilityService.getInstance()
+            ?: return null
 
-        }
+        return accessibilityService.getLastMessage()
     }
-
 }

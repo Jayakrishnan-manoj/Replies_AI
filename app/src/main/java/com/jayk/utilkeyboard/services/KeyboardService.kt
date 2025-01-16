@@ -1,5 +1,6 @@
 package com.jayk.utilkeyboard.services
 
+import android.content.ComponentName
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.inputmethodservice.InputMethodService
@@ -67,28 +68,32 @@ class KeyboardService(
     lateinit var accessibilityRepository: AccessibilityRepository
 
 
-    private val _isAccessibilityEnabled = MutableStateFlow(false)
-    val isAccessibilityEnabled: StateFlow<Boolean> = _isAccessibilityEnabled.asStateFlow()
-
-
     override fun onCreate() {
         super.onCreate()
         observeViewModel()
-        getMessages()
+//        getMessages()
     }
 
-    private fun getMessages() {
+
+
+    private fun getMessages(emotion: String?, isFormal: Boolean = false) {
+        if (!isAccessibilityServiceEnabled()) {
+            showAccessibilityPrompt()
+            return
+        }
+
         serviceScope.launch {
-            val messages = accessibilityRepository.getLatestMessages()
-            print(messages)
-            if (messages.isEmpty()) {
-                println("no messages, accessibility might be disabled")
-                //showAccessibilityPrompt()
+            val lastMessage = accessibilityRepository.getLastMessage()
+            if (lastMessage == null) {
+                println("No messages available")
             } else {
-                println(messages)
-                println(messages[0])
-                println(messages[1])
-                println(messages[2])
+                println("Last message: $lastMessage")
+                if (!isFormal) {
+                    chatViewModel.sendMessage("$emotion : $lastMessage")
+                } else {
+                    chatViewModel.sendMessage("formal:send some general formal text replies")
+                }
+
             }
         }
     }
@@ -311,32 +316,32 @@ class KeyboardService(
         chatBinding.apply {
             btnHappy.setOnClickListener {
                 updateButtonStates(it as Button, "Happy")
-                chatViewModel.sendMessage("happy: Hey I jst got into harvard")
+                getMessages("Happy")
             }
 
             btnSad.setOnClickListener {
                 updateButtonStates(it as Button, "Sad")
-                chatViewModel.sendMessage("sad: I got  rejected from harvard")
+                getMessages("Sad")
             }
 
             btnAngry.setOnClickListener {
                 updateButtonStates(it as Button, "Angry")
-                chatViewModel.sendMessage("angry: I crashed your car")
+                getMessages("Angry")
             }
 
             btnExcited.setOnClickListener {
                 updateButtonStates(it as Button, "Excited")
-                chatViewModel.sendMessage("Excited: I crashed your car")
+                getMessages("Excited")
             }
 
             btnFlirty.setOnClickListener {
                 updateButtonStates(it as Button, "Flirty")
-                chatViewModel.sendMessage("Flirty: I wanna get some sleep")
+                getMessages("Flirty")
             }
 
             btnFunny.setOnClickListener {
                 updateButtonStates(it as Button, "Funny")
-                chatViewModel.sendMessage("Funny: I crashed your car")
+                getMessages("Funny")
             }
 
             btnGoBack.setOnClickListener {
@@ -378,16 +383,15 @@ class KeyboardService(
         binding.btnAI.setOnClickListener {
             isChatScreen = true
             setInputView(onCreateInputView())
-            chatViewModel.sendMessage("formal: Send some general formal text replies")
-            getMessages()
-            // Update the input view to show chat layout
+            getMessages(null, true)
+
 
         }
     }
 
     private fun observeViewModel() {
-        chatViewModel.isLoading.observeForever{isLoading ->
-            if(isLoading) {
+        chatViewModel.isLoading.observeForever { isLoading ->
+            if (isLoading) {
                 chatBinding.loadingIndicator.visibility = View.VISIBLE
                 chatBinding.suggestionsRecyclerView.visibility = View.GONE
             } else {
@@ -406,6 +410,27 @@ class KeyboardService(
             suggestionsAdapter.submitList(suggestions)
             chatBinding.loadingIndicator.visibility = View.GONE
         }
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val enabledServices = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: return false
+
+        val componentName = ComponentName(packageName, MessageAccessibilityService::class.java.name)
+        return enabledServices.contains(componentName.flattenToString())
+    }
+
+    private fun showAccessibilityPrompt() {
+        val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        Toast.makeText(
+            this,
+            "Please enable accessibility service for message suggestions",
+            Toast.LENGTH_LONG
+        ).show()
+        startActivity(intent)
     }
 
 }

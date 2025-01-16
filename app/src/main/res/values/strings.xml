@@ -5,6 +5,8 @@
     <string name="enable_keyboard">enable keyboard</string>
     <string name="choose_keyboard">choose keyboard</string>
     <string name="And"><![CDATA[&]]></string>
+    <string name="accessibility_service_description">This service helps the keyboard read messages to provide smart reply suggestions</string>
     <string name="double_quotes">\"</string>
-
+    <string name="enable_accessibility_prompt">Please enable accessibility service for message suggestions</string>
+    <string name="accessibility_permission_required">Accessibility permission is required for message suggestions</string>
 </resources>

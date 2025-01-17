@@ -33,4 +33,10 @@ class AccessibilityRepositoryImpl @Inject constructor(
 
         return accessibilityService.getLastMessage()
     }
+
+    override fun checkForDatingApp(): Boolean? {
+        val accessibilityService = MessageAccessibilityService.getInstance()
+            ?: return null
+        return accessibilityService.getAppType()
+    }
 }

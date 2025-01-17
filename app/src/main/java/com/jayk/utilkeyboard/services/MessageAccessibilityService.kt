@@ -12,11 +12,15 @@ class MessageAccessibilityService : AccessibilityService() {
         private var instance: MessageAccessibilityService? = null
         private const val TAG = "MessageAccessibility"
         private const val WHATSAPP_PACKAGE = "com.whatsapp"
+        private const val BUMBLE_PACKAGE = "com.bumble.app"
+        private const val TINDER_PACKAGE = "com.tinder"
+        private const val HINGE_PACKAGE = "co.hinge.app"
 
         fun getInstance(): MessageAccessibilityService? = instance
     }
 
     private val messagesList = mutableListOf<String>()
+    private var isDatingApp: Boolean = false
 
     override fun onCreate() {
         super.onCreate()
@@ -30,11 +34,19 @@ class MessageAccessibilityService : AccessibilityService() {
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
         Log.d(TAG, "Received accessibility event: ${event.eventType}")
-        
+
         if (event.packageName?.toString() != WHATSAPP_PACKAGE) {
+            println(event.packageName?.toString())
             Log.d(TAG, "Ignoring event from package: ${event.packageName}")
             return
         }
+
+        if (event.packageName?.toString() == HINGE_PACKAGE || event.packageName?.toString() == BUMBLE_PACKAGE || event.packageName?.toString() == TINDER_PACKAGE){
+            isDatingApp = true
+        }
+
+
+            println("${event.packageName?.toString()} is the package")
 
         when (event.eventType) {
             AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED,
@@ -44,7 +56,7 @@ class MessageAccessibilityService : AccessibilityService() {
                     Log.e(TAG, "Root node is null")
                     return
                 }
-                
+
                 try {
                     findWhatsAppMessages(rootNode)
                 } catch (e: Exception) {
@@ -53,14 +65,16 @@ class MessageAccessibilityService : AccessibilityService() {
                     rootNode.recycle()
                 }
             }
+
             else -> Log.d(TAG, "Unhandled event type: ${event.eventType}")
         }
     }
 
     private fun findWhatsAppMessages(node: AccessibilityNodeInfo) {
         try {
-            if (node.viewIdResourceName?.contains("message_text") == true || 
-                node.viewIdResourceName?.contains("conversation_text") == true) {
+            if (node.viewIdResourceName?.contains("message_text") == true ||
+                node.viewIdResourceName?.contains("conversation_text") == true
+            ) {
                 node.text?.toString()?.let { message ->
                     if (message.isNotBlank() && !messagesList.contains(message)) {
                         messagesList.add(message)
@@ -70,10 +84,6 @@ class MessageAccessibilityService : AccessibilityService() {
                         Log.d(TAG, "New message captured: $message")
                     }
                 }
-            }
-
-            if (node.viewIdResourceName != null) {
-                Log.v(TAG, "Found node with ID: ${node.viewIdResourceName}")
             }
 
             for (i in 0 until node.childCount) {
@@ -92,6 +102,8 @@ class MessageAccessibilityService : AccessibilityService() {
     fun getLatestMessages(): List<String> = messagesList.toList()
 
     fun getLastMessage(): String? = messagesList.lastOrNull()
+
+    fun getAppType(): Boolean = isDatingApp
 
     override fun onServiceConnected() {
         super.onServiceConnected()

@@ -71,7 +71,6 @@ class KeyboardService(
     override fun onCreate() {
         super.onCreate()
         observeViewModel()
-//        getMessages()
     }
 
 
@@ -84,10 +83,21 @@ class KeyboardService(
 
         serviceScope.launch {
             val lastMessage = accessibilityRepository.getLastMessage()
+            val isDatingApp = accessibilityRepository.checkForDatingApp()
             if (lastMessage == null) {
                 println("No messages available")
+                chatBinding.apply {
+                    messageUnavailableText.visibility = View.VISIBLE
+                }
+
             } else {
+                chatBinding.apply {
+                    messageUnavailableText.visibility = View.GONE
+                }
                 println("Last message: $lastMessage")
+                if(isDatingApp!=null && isDatingApp) {
+                    chatViewModel.sendMessage("$emotion : $lastMessage", isDatingApp = true)
+                }
                 if (!isFormal) {
                     chatViewModel.sendMessage("$emotion : $lastMessage")
                 } else {

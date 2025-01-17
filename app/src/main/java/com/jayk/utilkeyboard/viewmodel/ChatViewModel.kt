@@ -22,31 +22,67 @@ class ChatViewModel @Inject constructor(
     val isLoading: LiveData<Boolean> = _isLoading
 
 
-    fun sendMessage(message: String) {
+    fun sendMessage(message: String, isDatingApp: Boolean = false) {
         viewModelScope.launch {
 
             _isLoading.value = true
-            try {
-                val messages = listOf(
-                    Message("For the text that user sends which is in the format: \"emotion:message\", give 4 appropriate responses in the emotion provided. The response must be an array of replies separating each message with a double pipe (`||`)." +
-                            "example: " +
-                            "user message - happy: I'm getting a raise, your response: [oh that's great!||so happy for you!||congratulations!]", "developer"),
-                    Message( message, "user")
-                )
 
-                when( val result = repository.getSearchResults("gpt-4o", messages)){
-                    is ApiResult.Success ->{
-                        _chatResponse.postValue(result.data)
+            if (isDatingApp) {
+                try {
+                    val messages = listOf(
+                        Message(
+                            "For messages in the format 'emotion:message', provide 4 flirty, engaging dating app responses that match the given emotion. The responses should be separated by double pipes (||). The responses should be appropriate for dating app conversations and encourage further interaction." +
+                                    "Example:" +
+                                    "User message - happy: Just got a promotion at work!" +
+                                    "Response: [Would love to celebrate your success over drinks! 🎉||This is amazing - your ambition is super attractive! 😊||Congratulations! Let's plan something special to celebrate? 🌟||Love seeing you win! Coffee on me to hear all about it? ☕]",
+                            "developer"
+                        ),
+                        Message(message, "user")
+                    )
 
+                    when (val result = repository.getSearchResults("gpt-4o", messages)) {
+                        is ApiResult.Success -> {
+                            _chatResponse.postValue(result.data)
+
+                        }
+
+                        is ApiResult.Error -> {
+                            val errorMessage = result.message
+
+                            println(errorMessage)
+                        }
                     }
-                    is ApiResult.Error -> {
-                        val errorMessage = result.message
-
-                        println(errorMessage)
-                    }
+                } finally {
+                    _isLoading.value = false
                 }
-            } finally {
-                _isLoading.value = false
+            } else {
+
+                try {
+                    val messages = listOf(
+                        Message(
+                            "For the text that user sends which is in the format: \"emotion:message\", give 4 appropriate responses in the emotion provided. The response must be an array of replies separating each message with a double pipe (`||`). and must contain emojis" +
+                                    "example: " +
+                                    "user message - happy: I'm getting a raise, your response: [oh that's great!||so happy for you!||congratulations!]",
+                            "developer"
+                        ),
+                        Message(message, "user")
+                    )
+
+                    when (val result = repository.getSearchResults("gpt-4o", messages)) {
+                        is ApiResult.Success -> {
+                            _chatResponse.postValue(result.data)
+
+                        }
+
+                        is ApiResult.Error -> {
+                            val errorMessage = result.message
+
+                            println(errorMessage)
+                        }
+                    }
+                } finally {
+                    _isLoading.value = false
+                }
             }
 
 

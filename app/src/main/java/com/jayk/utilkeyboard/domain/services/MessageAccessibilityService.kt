@@ -1,4 +1,4 @@
-package com.jayk.utilkeyboard.services
+package com.jayk.utilkeyboard.domain.services
 
 import android.accessibilityservice.AccessibilityService
 import android.view.accessibility.AccessibilityEvent

@@ -1,4 +1,4 @@
-package com.jayk.utilkeyboard.viewmodel
+package com.jayk.utilkeyboard.presentation.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

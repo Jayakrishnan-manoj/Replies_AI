@@ -1,4 +1,4 @@
-package com.jayk.utilkeyboard.viewmodel
+package com.jayk.utilkeyboard.presentation.viewmodel
 
 import com.jayk.utilkeyboard.data.repository.APIRepository
 import javax.inject.Inject

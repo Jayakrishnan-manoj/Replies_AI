@@ -1,4 +1,4 @@
-package com.jayk.utilkeyboard.presentation
+package com.jayk.utilkeyboard.presentation.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

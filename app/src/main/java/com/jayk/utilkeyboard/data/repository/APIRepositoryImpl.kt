@@ -1,10 +1,10 @@
-package com.jayk.utilkeyboard.data
+package com.jayk.utilkeyboard.data.repository
 
 import com.jayk.utilkeyboard.BuildConfig
+import com.jayk.utilkeyboard.data.ApiResult
 import com.jayk.utilkeyboard.data.models.request.ChatRequest
 import com.jayk.utilkeyboard.data.models.request.Message
 import com.jayk.utilkeyboard.data.models.response.ChatResponse
-import com.jayk.utilkeyboard.data.repository.APIRepository
 import com.jayk.utilkeyboard.data.services.APIService
 import javax.inject.Inject
 

@@ -1,10 +1,8 @@
-package com.jayk.utilkeyboard.data
+package com.jayk.utilkeyboard.domain.repositories
 
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
-import android.view.accessibility.AccessibilityNodeInfo
-import com.jayk.utilkeyboard.repositories.AccessibilityRepository
-import com.jayk.utilkeyboard.services.MessageAccessibilityService
+import com.jayk.utilkeyboard.domain.services.MessageAccessibilityService
 import javax.inject.Inject
 
 class AccessibilityRepositoryImpl @Inject constructor(

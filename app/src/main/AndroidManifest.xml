@@ -14,7 +14,7 @@
         android:theme="@style/Theme.UtilKeyboard"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".presentation.MainActivity"
             android:theme="@style/Theme.UtilKeyboard"
             android:exported="true">
             <intent-filter>
@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".services.KeyboardService"
+            android:name=".domain.services.KeyboardService"
             android:exported="true"
             android:label="Util Keyboard"
             android:theme="@style/Theme.UtilKeyboard"
@@ -37,7 +37,7 @@
                 android:resource="@xml/method" />
         </service>
         <service
-            android:name=".services.MessageAccessibilityService"
+            android:name=".domain.services.MessageAccessibilityService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
             android:exported="true">
             <intent-filter>

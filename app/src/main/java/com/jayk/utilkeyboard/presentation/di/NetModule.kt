@@ -1,6 +1,6 @@
-package com.jayk.utilkeyboard.di
+package com.jayk.utilkeyboard.presentation.di
 
-import com.jayk.utilkeyboard.data.APIRepositoryImpl
+import com.jayk.utilkeyboard.data.repository.APIRepositoryImpl
 import com.jayk.utilkeyboard.data.repository.APIRepository
 import com.jayk.utilkeyboard.data.services.APIService
 import dagger.Module
@@ -9,7 +9,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 

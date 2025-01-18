@@ -1,4 +1,4 @@
-package com.jayk.utilkeyboard.di
+package com.jayk.utilkeyboard.presentation.di
 
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
@@ -9,12 +9,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 import android.content.Context.ACCESSIBILITY_SERVICE
-import com.jayk.utilkeyboard.data.AccessibilityRepositoryImpl
-import com.jayk.utilkeyboard.repositories.AccessibilityRepository
+import com.jayk.utilkeyboard.domain.repositories.AccessibilityRepositoryImpl
+import com.jayk.utilkeyboard.domain.repositories.AccessibilityRepository
 
-@Module
+@Module()
 @InstallIn(SingletonComponent::class)
-object AppModule {
+object AccessibilityModule {
 
     @Provides
     @Singleton
@@ -24,7 +24,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAccessibilityRepository(@ApplicationContext context: Context,accessibilityManager: AccessibilityManager) : AccessibilityRepository{
+    fun provideAccessibilityRepository(@ApplicationContext context: Context,accessibilityManager: AccessibilityManager) : AccessibilityRepository {
         return AccessibilityRepositoryImpl(context,accessibilityManager)
     }
 

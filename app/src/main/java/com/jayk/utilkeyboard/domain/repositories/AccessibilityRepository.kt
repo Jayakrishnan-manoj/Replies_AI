@@ -1,4 +1,4 @@
-package com.jayk.utilkeyboard.repositories
+package com.jayk.utilkeyboard.domain.repositories
 
 interface AccessibilityRepository {
     fun getLatestMessages(): List<String>

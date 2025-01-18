@@ -4,9 +4,12 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.inputmethodservice.InputMethodService
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
+import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -120,6 +123,16 @@ class KeyboardService(
 
     override val viewModelStore: ViewModelStore
         get() = _viewModelStore
+
+    var backspaceHandler: Handler? = null
+    val backspaceRunnable = object : Runnable {
+        override fun run() {
+            currentInputConnection?.sendKeyEvent(
+                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
+            )
+            backspaceHandler?.postDelayed(this, 50)
+        }
+    }
 
 
     override fun onCreateInputView(): View {
@@ -276,18 +289,70 @@ class KeyboardService(
             toggleSymbolsMode()
         }
 
-        binding.btnBackSpace.setOnClickListener { view ->
-            performHapticFeedback(view)
-            currentInputConnection?.sendKeyEvent(
-                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
-            )
+        binding.btnBackSpace.apply {
+            setOnClickListener {
+                currentInputConnection?.sendKeyEvent(
+                    KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
+                )
+            }
+
+            setOnTouchListener { view, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        performHapticFeedback(view)
+                        // Start continuous deletion after a delay
+                        backspaceHandler = Handler(Looper.getMainLooper()).apply {
+                            postDelayed(backspaceRunnable, 400)
+                        }
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        backspaceHandler?.removeCallbacks(backspaceRunnable)
+                        backspaceHandler = null
+                        view.performClick()
+                        true
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        backspaceHandler?.removeCallbacks(backspaceRunnable)
+                        backspaceHandler = null
+                        true
+                    }
+                    else -> false
+                }
+            }
         }
 
-        binding.btnBackSpace2.setOnClickListener { view ->
-            performHapticFeedback(view)
-            currentInputConnection?.sendKeyEvent(
-                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
-            )
+        binding.btnBackSpace2.apply {
+            setOnClickListener {
+                currentInputConnection?.sendKeyEvent(
+                    KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
+                )
+            }
+
+            setOnTouchListener { view, event ->
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        performHapticFeedback(view)
+                        // Start continuous deletion after a delay
+                        backspaceHandler = Handler(Looper.getMainLooper()).apply {
+                            postDelayed(backspaceRunnable, 400)
+                        }
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        backspaceHandler?.removeCallbacks(backspaceRunnable)
+                        backspaceHandler = null
+                        view.performClick()
+                        true
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        backspaceHandler?.removeCallbacks(backspaceRunnable)
+                        backspaceHandler = null
+                        true
+                    }
+                    else -> false
+                }
+            }
         }
 
         binding.btnCapitalize.setOnClickListener { view ->

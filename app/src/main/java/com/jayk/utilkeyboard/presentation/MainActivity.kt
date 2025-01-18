@@ -37,13 +37,13 @@ class MainActivity : AppCompatActivity() {
                 if(!isKeyboardEnabled())
                     openKeyboardSettings()
             }
-            btnChooseKeyboard.setOnClickListener {
-                if(isKeyboardEnabled()){
-                    openKeyboardChooserSettings()
-                }else{
-                    Toast.makeText(this@MainActivity,"Enable the keyboard", Toast.LENGTH_LONG).show()
-                }
-            }
+//            btnChooseKeyboard.setOnClickListener {
+//                if(isKeyboardEnabled()){
+//                    openKeyboardChooserSettings()
+//                }else{
+//                    Toast.makeText(this@MainActivity,"Enable the keyboard", Toast.LENGTH_LONG).show()
+//                }
+//            }
         }
     }
 

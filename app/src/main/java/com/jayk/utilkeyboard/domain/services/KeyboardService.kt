@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.Toast
 import androidx.core.content.ContextCompat
@@ -56,12 +57,26 @@ class KeyboardService(
     lateinit var accessibilityRepository: AccessibilityRepository
 
 
+    override fun onWindowHidden() {
+        super.onWindowHidden()
+        println("on window hidden called")
+        isChatScreen = false
+    }
+
     override fun onCreate() {
         super.onCreate()
+        println("On create called")
+        isChatScreen = false
         observeViewModel()
     }
 
+    override fun onStartInput(attribute: EditorInfo?, restarting: Boolean) {
+        super.onStartInput(attribute, restarting)
+        println("inside onStartInput method")
+        isChatScreen = false
+        setInputView(onCreateInputView())
 
+    }
 
     private fun getMessages(emotion: String?, isFormal: Boolean = false) {
         if (!isAccessibilityServiceEnabled()) {
@@ -83,7 +98,7 @@ class KeyboardService(
                     messageUnavailableText.visibility = View.GONE
                 }
                 println("Last message: $lastMessage")
-                if(isDatingApp!=null && isDatingApp) {
+                if (isDatingApp != null && isDatingApp) {
                     chatViewModel.sendMessage("$emotion : $lastMessage", isDatingApp = true)
                 }
                 if (!isFormal) {
@@ -98,6 +113,8 @@ class KeyboardService(
 
     override fun onDestroy() {
         super.onDestroy()
+        println("On destroy called")
+        isChatScreen = false
         serviceScope.cancel()
     }
 
@@ -106,8 +123,10 @@ class KeyboardService(
 
 
     override fun onCreateInputView(): View {
+        println("on create input view called")
         binding = KeyboardLayoutBinding.inflate(layoutInflater)
         chatBinding = ChatSuggestionsLayoutBinding.inflate(layoutInflater)
+        println("currently isChatScreen is $isChatScreen")
 
         setupButtons()
         setupRecyclerView()

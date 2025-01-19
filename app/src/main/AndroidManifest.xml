@@ -26,7 +26,7 @@
         <service
             android:name=".domain.services.KeyboardService"
             android:exported="true"
-            android:label="Util Keyboard"
+            android:label="RepliesAI"
             android:theme="@style/Theme.UtilKeyboard"
             android:permission="android.permission.BIND_INPUT_METHOD">
             <intent-filter>

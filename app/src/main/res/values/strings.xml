@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">Util Keyboard</string>
+    <string name="app_name">RepliesAI</string>
     <string name="_1">_1</string>
-    <string name="util_keyboard">Util Keyboard</string>
+    <string name="util_keyboard">RepliesAI</string>
     <string name="enable_keyboard">enable keyboard</string>
     <string name="choose_keyboard">choose keyboard</string>
     <string name="And"><![CDATA[&]]></string>

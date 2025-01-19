@@ -30,7 +30,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -133,6 +137,23 @@ class KeyboardService(
             backspaceHandler?.postDelayed(this, 50)
         }
     }
+    private var spaceHandler: Handler? = null
+    private var letterHandler: Handler? = null
+    private var currentKey: String = ""
+
+    private val keyRepeatRunnable = object : Runnable {
+        override fun run() {
+            currentInputConnection?.commitText(currentKey, 1)
+            letterHandler?.postDelayed(this, 50)
+        }
+    }
+
+    private val spaceRepeatRunnable = object : Runnable {
+        override fun run() {
+            currentInputConnection?.commitText(" ", 1)
+            spaceHandler?.postDelayed(this, 50)
+        }
+    }
 
 
     override fun onCreateInputView(): View {
@@ -147,11 +168,47 @@ class KeyboardService(
 
         println(isCapitalized)
 
+        fun commitText(text: String) {
+            currentInputConnection?.commitText(text, 1)
+        }
+
         fun performHapticFeedback(view: View) {
             view.performHapticFeedback(
                 HapticFeedbackConstants.KEYBOARD_TAP,
+            )
+        }
 
-                )
+        fun setupKeyWithRepeat(button: View, text: String) {
+            button.setOnTouchListener { view, event ->
+                view.background.setHotspot(event.x, event.y)
+
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        view.isPressed = true
+                        performHapticFeedback(view)
+                        currentKey = text
+                        letterHandler = Handler(Looper.getMainLooper()).apply {
+                            postDelayed(keyRepeatRunnable, 400) // Initial delay before repeat
+                        }
+                        currentInputConnection?.commitText(text, 1)
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.isPressed = false
+                        letterHandler?.removeCallbacks(keyRepeatRunnable)
+                        letterHandler = null
+                        view.performClick()
+                        true
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        view.isPressed = false
+                        letterHandler?.removeCallbacks(keyRepeatRunnable)
+                        letterHandler = null
+                        true
+                    }
+                    else -> false
+                }
+            }
         }
 
         val letterButtons = mapOf(
@@ -252,37 +309,55 @@ class KeyboardService(
             updateButtonTexts()
         }
 
-        symbolButtons.forEach { (button, text) ->
-            button.setOnClickListener { view ->
-                performHapticFeedback(view)
-                currentInputConnection?.commitText(text, 1)
-
-            }
-        }
-
         letterButtons.forEach { (button, textPair) ->
-            button.setOnClickListener { view ->
-                view.performHapticFeedback(
-                    HapticFeedbackConstants.KEYBOARD_TAP,
-                )
-                val textToCommit = if (isCapitalized) textPair.second else textPair.first
-                currentInputConnection?.commitText(textToCommit, 1)
+            button.setOnTouchListener { view, event ->
+                view.background.setHotspot(event.x, event.y)
+
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        view.isPressed = true
+                        performHapticFeedback(view)
+                        val textToCommit = if (isCapitalized) textPair.second else textPair.first
+                        currentKey = textToCommit
+                        letterHandler = Handler(Looper.getMainLooper()).apply {
+                            postDelayed(keyRepeatRunnable, 400)
+                        }
+                        currentInputConnection?.commitText(textToCommit, 1)
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.isPressed = false  // Release pressed state
+                        letterHandler?.removeCallbacks(keyRepeatRunnable)
+                        letterHandler = null
+                        view.performClick()
+                        true
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        view.isPressed = false  // Release pressed state
+                        letterHandler?.removeCallbacks(keyRepeatRunnable)
+                        letterHandler = null
+                        true
+                    }
+                    else -> false
+                }
             }
         }
 
+        // Apply to number buttons
         numberButtons.forEach { (button, text) ->
-            button.setOnClickListener { view ->
-                performHapticFeedback(view)
-                currentInputConnection?.commitText(text, 1)
-            }
+            setupKeyWithRepeat(button, text)
         }
 
-        punctuationButtons.forEach { (button, text) ->
-            button.setOnClickListener { view ->
-                performHapticFeedback(view)
-                currentInputConnection?.commitText(text, 1)
-            }
+        // Apply to symbol buttons
+        symbolButtons.forEach { (button, text) ->
+            setupKeyWithRepeat(button, text)
         }
+
+        // Apply to punctuation buttons
+        punctuationButtons.forEach { (button, text) ->
+            setupKeyWithRepeat(button, text)
+        }
+
 
         binding.btnSymbols.setOnClickListener { view ->
             performHapticFeedback(view)
@@ -323,6 +398,7 @@ class KeyboardService(
         }
 
         binding.btnBackSpace2.apply {
+
             setOnClickListener {
                 currentInputConnection?.sendKeyEvent(
                     KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)
@@ -377,11 +453,40 @@ class KeyboardService(
 
         //updateButtonTexts()
 
-        binding.btnSpace.setOnClickListener { view ->
-            performHapticFeedback(view)
-            currentInputConnection?.sendKeyEvent(
-                KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_SPACE)
-            )
+        binding.btnSpace.apply {
+            setOnTouchListener { view, event ->
+                view.background.setHotspot(event.x, event.y)
+
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        view.isPressed = true
+                        performHapticFeedback(view)
+
+                        // Initial space press
+                        currentInputConnection?.commitText(" ", 1)
+
+                        // Start continuous spaces after delay
+                        spaceHandler = Handler(Looper.getMainLooper()).apply {
+                            postDelayed(spaceRepeatRunnable, 400)
+                        }
+                        true
+                    }
+                    MotionEvent.ACTION_UP -> {
+                        view.isPressed = false
+                        spaceHandler?.removeCallbacks(spaceRepeatRunnable)
+                        spaceHandler = null
+                        view.performClick()
+                        true
+                    }
+                    MotionEvent.ACTION_CANCEL -> {
+                        view.isPressed = false
+                        spaceHandler?.removeCallbacks(spaceRepeatRunnable)
+                        spaceHandler = null
+                        true
+                    }
+                    else -> false
+                }
+            }
         }
 
         binding.btnEnter.setOnClickListener { view ->

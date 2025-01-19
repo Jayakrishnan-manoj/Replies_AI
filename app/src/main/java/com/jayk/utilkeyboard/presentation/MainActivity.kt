@@ -27,7 +27,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            v.setPadding(
+                systemBars.left + v.paddingLeft,  // Add XML paddingLeft
+                systemBars.top,  // Add XML paddingTop
+                systemBars.right + v.paddingRight, // Add XML paddingRight
+                systemBars.bottom + v.paddingBottom // Add XML paddingBottom
+            )
             insets
         }
         binding.apply {
@@ -37,13 +42,17 @@ class MainActivity : AppCompatActivity() {
                 if(!isKeyboardEnabled())
                     openKeyboardSettings()
             }
-//            btnChooseKeyboard.setOnClickListener {
-//                if(isKeyboardEnabled()){
-//                    openKeyboardChooserSettings()
-//                }else{
-//                    Toast.makeText(this@MainActivity,"Enable the keyboard", Toast.LENGTH_LONG).show()
-//                }
-//            }
+
+            btnTryKeyboard.setOnClickListener {
+
+                val intent = packageManager.getLaunchIntentForPackage("com.whatsapp")
+                if (intent != null) {
+                    startActivity(intent)
+                } else {
+                    println("nothing")
+                }
+                openKeyboardChooserSettings()
+            }
         }
     }
 
